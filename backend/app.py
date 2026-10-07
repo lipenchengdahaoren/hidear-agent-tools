@@ -332,6 +332,7 @@ class App:
     def __init__(self, service, public_only=False):
         self.service = service
         self.public_only = public_only
+        self.last_public_request = None
 
     def __call__(self, env, start_response):
         path, method = env.get("PATH_INFO", ""), env.get("REQUEST_METHOD", "GET")
@@ -340,6 +341,8 @@ class App:
         try:
             if method == "GET" and path == "/health":
                 result = {"status": "ok", "version": "0.1.0", "automatic_notifications": False}
+                if self.public_only:
+                    result["last_public_request"] = self.last_public_request
             elif method == "GET" and path == "/openapi.json":
                 result = openapi()
             elif method == "GET" and path == "/":
@@ -400,6 +403,8 @@ class App:
             result = {"success": False, "request_id": uuid.uuid4().hex, "result": None, "error": {"code": "internal_error", "message": "服务暂不可用，请稍后重试"}}
         if isinstance(result, dict) and "success" in result:
             result["code"] = 0 if result["success"] else 1
+        if self.public_only and path.startswith('/public/tools/'):
+            self.last_public_request = {"time": iso(now()), "method": method, "path": path, "content_type": env.get('CONTENT_TYPE', '').split(';')[0][:80], "status": status, "error_code": result.get('error', {}).get('code') if result.get('error') else None}
         body = result if isinstance(result, bytes) else json.dumps(result, ensure_ascii=False).encode()
         from http import HTTPStatus
         headers = [("Content-Type", content_type), ("Content-Length", str(len(body))), ("Cache-Control", "no-store"), ("X-Content-Type-Options", "nosniff"), ("Referrer-Policy", "no-referrer"), ("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'")]
@@ -447,3 +452,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
