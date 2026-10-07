@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+backend/data/
+*.sqlite3*
+*.token
+.env
+.venv/
+hidear-draft-test.jpg
+*.zip
+dist/

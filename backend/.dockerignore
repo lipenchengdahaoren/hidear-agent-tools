@@ -1,0 +1,5 @@
+data
+__pycache__
+*.token
+.env
+test_*.py

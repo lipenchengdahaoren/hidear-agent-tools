@@ -1,0 +1,660 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "HiDear Tools",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/tools/save_information": {
+      "post": {
+        "operationId": "save_information",
+        "description": "保存当前用户提供的公告线索。始终标为未核实；不能用于替代官方核验。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "公告标题",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "source_url": {
+                    "type": "string",
+                    "description": "官方原文 HTTPS 链接",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "城市或全国",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "topic": {
+                    "type": "string",
+                    "description": "主题",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "summary": {
+                    "type": "string",
+                    "description": "公开信息摘要，不填个人资料",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  },
+                  "deadline_at": {
+                    "type": "string",
+                    "description": "截止时间，带时区；未知则不传",
+                    "minLength": 1,
+                    "maxLength": 40
+                  }
+                },
+                "required": [
+                  "title",
+                  "source_url",
+                  "city",
+                  "topic",
+                  "summary"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/search_information": {
+      "post": {
+        "operationId": "search_information",
+        "description": "查询已收录的公开信息与当前用户的未核实线索。不是全网搜索；空结果不表示没有政策。默认排除过期、撤回事项。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "标题、主题或摘要关键词",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "城市；同时匹配全国事项",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "include_expired": {
+                    "type": "boolean",
+                    "description": "是否包含过期事项"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "最多返回条数",
+                    "minimum": 1,
+                    "maximum": 20
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/get_information": {
+      "post": {
+        "operationId": "get_information",
+        "description": "获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "information_id": {
+                    "type": "string",
+                    "description": "信息标识",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "information_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/prepare_action": {
+      "post": {
+        "operationId": "prepare_action",
+        "description": "生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "information_id": {
+                    "type": "string",
+                    "description": "信息标识",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "information_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/create_followup": {
+      "post": {
+        "operationId": "create_followup",
+        "description": "用户明确同意后记录事项和到期时间。记录成功不代表手机通知成功；返回通知状态和日历导出链接。禁止填证件、医疗或财务资料。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "待办标题，不含敏感资料",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "due_at": {
+                    "type": "string",
+                    "description": "用户确认的时间，必须带时区",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "information_id": {
+                    "type": "string",
+                    "description": "关联信息标识，未知则不传",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "confirmed": {
+                    "type": "boolean",
+                    "description": "用户是否明确确认记录此事项"
+                  }
+                },
+                "required": [
+                  "title",
+                  "due_at",
+                  "confirmed"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/list_followups": {
+      "post": {
+        "operationId": "list_followups",
+        "description": "查询当前用户的跟进事项或到期事项。身份由认证决定，不接受 user_id。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "事项状态",
+                    "enum": [
+                      "open",
+                      "completed",
+                      "cancelled",
+                      "all"
+                    ]
+                  },
+                  "due_only": {
+                    "type": "boolean",
+                    "description": "只返回已经到期的未完成事项"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/tools/update_followup": {
+      "post": {
+        "operationId": "update_followup",
+        "description": "用户确认后完成、取消或改期自己的待办。version 防止覆盖并发更新。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "followup_id": {
+                    "type": "string",
+                    "description": "跟进标识",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "version": {
+                    "type": "integer",
+                    "description": "当前版本",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "新状态",
+                    "enum": [
+                      "open",
+                      "completed",
+                      "cancelled"
+                    ]
+                  },
+                  "due_at": {
+                    "type": "string",
+                    "description": "新的带时区时间",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "confirmed": {
+                    "type": "boolean",
+                    "description": "用户明确同意修改"
+                  }
+                },
+                "required": [
+                  "followup_id",
+                  "version",
+                  "confirmed"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/public/tools/search_information": {
+      "post": {
+        "operationId": "public_search_information",
+        "description": "查询已收录的公开信息与当前用户的未核实线索。不是全网搜索；空结果不表示没有政策。默认排除过期、撤回事项。 此公开接口仅返回管理员收录的公开信息，不读取用户线索。",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "标题、主题或摘要关键词",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "城市；同时匹配全国事项",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "include_expired": {
+                    "type": "boolean",
+                    "description": "是否包含过期事项"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "最多返回条数",
+                    "minimum": 1,
+                    "maximum": 20
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/public/tools/get_information": {
+      "post": {
+        "operationId": "public_get_information",
+        "description": "获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。 此公开接口仅返回管理员收录的公开信息，不读取用户线索。",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "information_id": {
+                    "type": "string",
+                    "description": "信息标识",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "information_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    },
+    "/public/tools/prepare_action": {
+      "post": {
+        "operationId": "public_prepare_action",
+        "description": "生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。 此公开接口仅返回管理员收录的公开信息，不读取用户线索。",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "information_id": {
+                    "type": "string",
+                    "description": "信息标识",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "information_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "含 success、request_id、result、error 的结果"
+          },
+          "400": {
+            "description": "输入或确认缺失"
+          },
+          "401": {
+            "description": "凭证无效"
+          },
+          "404": {
+            "description": "资源无访问权限"
+          },
+          "409": {
+            "description": "版本、幂等或过期冲突"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
