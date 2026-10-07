@@ -17,7 +17,7 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def run(tool, arguments, request_id=None):
+def run(tool, arguments, request_id=None, public=False):
     base = os.environ.get('HIDEAR_BASE_URL', '').rstrip('/')
     parsed = urlsplit(base)
     local = parsed.hostname in ('127.0.0.1', 'localhost', '::1')
@@ -25,18 +25,17 @@ def run(tool, arguments, request_id=None):
         raise ValueError('请配置 HTTPS HIDEAR_BASE_URL，本地体验可用 http://127.0.0.1:8765')
     if tool not in WRITE_TOOLS | READ_TOOLS:
         raise ValueError('工具名称不支持')
+    if public and tool not in {'search_information', 'get_information', 'prepare_action'}:
+        raise ValueError('公开演示只支持查询、详情和行动准备')
     token_file = os.environ.get('HIDEAR_TOKEN_FILE')
-    if not token_file:
-        raise ValueError('请由宿主配置 HIDEAR_TOKEN_FILE，不把凭证放在对话参数中')
-    token = Path(token_file).read_text(encoding='utf-8').strip()
-    if not token or len(token) > 200 or '\n' in token or '\r' in token:
-        raise ValueError('用户凭证文件格式不正确')
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
+    headers = {'Content-Type': 'application/json'}
+    if not public:
+        headers.update(private_headers(token_file))
     if tool in WRITE_TOOLS:
         if not request_id or not 8 <= len(request_id) <= 128:
             raise ValueError('写操作必须提供 --request-id；重试使用原标识，新操作使用新标识')
         headers['Idempotency-Key'] = request_id
-    request = Request(base + '/tools/' + tool, data=json.dumps(arguments, ensure_ascii=False).encode(), headers=headers, method='POST')
+    request = Request(base + ('/public/tools/' if public else '/tools/') + tool, data=json.dumps(arguments, ensure_ascii=False).encode(), headers=headers, method='POST')
     try:
         with build_opener(NoRedirect()).open(request, timeout=15) as response:
             return json.loads(response.read(131072))
@@ -49,14 +48,24 @@ def run(tool, arguments, request_id=None):
         return {'success': False, 'error': {'code': 'connection_failed', 'message': '无法连接工具服务；写操作结果未知，重试须使用原 request-id'}, 'result': None}
 
 
+def private_headers(token_file):
+    if not token_file:
+        raise ValueError('请由宿主配置 HIDEAR_TOKEN_FILE，不把凭证放在对话参数中')
+    token = Path(token_file).read_text(encoding='utf-8').strip()
+    if not token or len(token) > 200 or '\n' in token or '\r' in token:
+        raise ValueError('用户凭证文件格式不正确')
+    return {'Authorization': 'Bearer ' + token}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('tool', choices=sorted(WRITE_TOOLS | READ_TOOLS))
     parser.add_argument('--request-id')
+    parser.add_argument('--public', action='store_true', help='仅访问公开只读演示，不发送用户凭证')
     args = parser.parse_args()
     try:
         data = json.load(sys.stdin)
-        result = run(args.tool, data, args.request_id)
+        result = run(args.tool, data, args.request_id, public=args.public)
     except (ValueError, OSError):
         result = {'success': False, 'result': None, 'error': {'code': 'configuration_or_input_error', 'message': '请检查宿主服务地址、私有凭证文件和 JSON 输入；写操作必须提供 request-id'}}
     print(json.dumps(result, ensure_ascii=False))

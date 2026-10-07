@@ -33,6 +33,26 @@ def manifests(base_url):
         description = {'overview': TOOLS[name]['description'], 'useCases': '查询管理员收录的公开公告；不读取个人记录', 'constraints': '需服务已部署。不是全网搜索；不提交报名、不设置提醒', 'output': 'code、success、request_id、result、error', 'example': '在当前信息库查询公开信息'}
         protocol = {'operationId': identity, 'name': labels[name], 'appCode': 'hiDear', 'description': json.dumps(description, ensure_ascii=False), 'skillSource': '2', 'agentVersion': 30000, 'androidPerm': '[]', 'supportDevice': 5, 'executeScenarios': 7, 'remark': '', 'protocolType': 'vivo', 'daMetaData': None, 'skillFrameworkSpec': 'skillFw2_4', 'functionName': identity, 'parameters': TOOLS[name]['schema'], 'returns': {'type': 'Object', 'description': '统一返回结构', 'properties': {'code': {'type': 'integer', 'enum': [0, 1]}, 'success': {'type': 'boolean'}, 'request_id': {'type': 'string'}, 'result': {'type': 'object'}, 'error': {'type': 'object'}}, 'required': ['code', 'success', 'request_id']}, 'platformConfigs': {'customBasicFields': {}, 'customParamFields': {}, 'customReturnFields': {}}}
         result.append({'operationId': identity, 'name': labels[name], 'appCode': 'hiDear', 'appName': 'HiDear', 'description': json.dumps(description, ensure_ascii=False), 'kitVer': 'skillFw2_4', 'callDemo': '[]', 'skillUrl': base_url + '/public/tools/' + name if base_url else '', 'httpHeaders': '{"Content-Type":"application/json"}', 'defBodyParams': '{}', 'timeout': '5000', 'skillProtocol': json.dumps(protocol, ensure_ascii=False), 'triggerQueries': ['查找和我有关的重要信息', '帮我核对这条公告', '查看培训报名条件', '我要准备什么材料', '这条信息截止了吗']})
+    for item in result:
+        name = item['operationId'][len('hidear_'):]
+        description = json.loads(item['description'])
+        if name == 'search_information':
+            description['overview'] = '查询 HiDear 已收录的公开服务信息，返回官方来源、核验状态和缺失字段。不是全网搜索，不读取个人记录。'
+        description['constraints'] = '只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。'
+        item['description'] = json.dumps(description, ensure_ascii=False)
+        protocol = json.loads(item['skillProtocol'])
+        protocol['description'] = item['description']
+        descriptions = {'code': '状态码，0成功，1失败', 'success': '调用是否成功', 'request_id': '本次调用标识', 'result': '公开信息或行动清单；失败时为空', 'error': '错误代码和说明；成功时为空'}
+        for key, value in descriptions.items():
+            protocol['returns']['properties'][key]['description'] = value
+        item['skillProtocol'] = json.dumps(protocol, ensure_ascii=False)
+        item['triggerQueries'] = {
+            'search_information': ['查询北京残疾人服务信息', '查找收录的补贴信息', '有没有办证相关信息', '找找公开服务公告', '查询与就业有关的重要信息'],
+            'get_information': ['查看这条公告的官方来源', '这条信息核实了吗', '看看这条服务信息的详情', '这条公告还有哪些信息待确认', '查询这条公告的核验时间'],
+            'prepare_action': ['根据这条公告列出下一步', '我需要先核对什么条件', '帮我准备行动清单', '这条信息需要哪些材料', '办理前还缺哪些信息']
+        }[name]
+        example = {'query': '补贴', 'city': '北京'} if name == 'search_information' else {'information_id': hashlib.sha256(b'https://banshi.beijing.gov.cn/tzgg/202609/t20260916_428703.html').hexdigest()[:32]}
+        item['callDemo'] = json.dumps([{'name': item['triggerQueries'][0], 'execution': {'appCode': 'hiDear', 'operationId': item['operationId'], 'params': example}, 'validation': {'expectedCode': 0, 'expectedResult': '{"code":0,"success":true}'}, 'demoFiles': []}], ensure_ascii=False)
     return result
 
 

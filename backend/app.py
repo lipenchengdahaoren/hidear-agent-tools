@@ -179,7 +179,7 @@ class Service:
             url(record["action_url"])
         with self.connection() as db:
             row = db.execute("SELECT id FROM information WHERE owner='public' AND source_url=?", (record["source_url"],)).fetchone()
-            identity = row["id"] if row else uuid.uuid4().hex
+            identity = row["id"] if row else hashlib.sha256(record["source_url"].encode()).hexdigest()[:32]
             result = dict(record, id=identity, verification_status=status, saved_at=iso(now()))
             db.execute("INSERT INTO information VALUES(?,?,?,?) ON CONFLICT(owner,source_url) DO UPDATE SET data=excluded.data", (identity, "public", record["source_url"], json.dumps(result, ensure_ascii=False)))
         return result

@@ -5,6 +5,12 @@ description: 面向聋人、听障和语障用户，发现与核验重要公开�
 
 # HiDear 信息与行动
 
+## 已部署的公开演示
+
+公开服务地址：https://hidear-public-demo.onrender.com 。仅支持 search_information、get_information、prepare_action；无需登录，不读取个人记录，不保存跟进。宿主可将三个 /public/tools/ 接口注册为工具。支持 Python 的宿主可配置 HIDEAR_BASE_URL 后使用 `python scripts/hidear_tool.py search_information --public`，JSON 参数从标准输入传入；不需要 HIDEAR_TOKEN_FILE。
+
+免费服务闲置后休眠，唤醒可能超过工具超时时间。失败时明确说明尚未取得结果，可让用户打开演示首页等待后重试。不能伪装后台持续发现或已设置通知。当前只收录少量公开信息，需配合实际联网搜索与官方原文核验。
+
 ## 使用前检查
 
 确认当前宿主真实提供的工具及其输入输出。未提供的工具不得伪装调用；本包不包含后端、采集器或通知服务。规则可以由宿主工作流实现，但不是服务已上线的证据。

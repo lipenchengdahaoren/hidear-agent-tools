@@ -4,20 +4,20 @@
     "name": "查询重要信息",
     "appCode": "hiDear",
     "appName": "HiDear",
-    "description": "{\"overview\": \"查询已收录的公开信息与当前用户的未核实线索。不是全网搜索；空结果不表示没有政策。默认排除过期、撤回事项。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"需服务已部署。不是全网搜索；不提交报名、不设置提醒\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
+    "description": "{\"overview\": \"查询 HiDear 已收录的公开服务信息，返回官方来源、核验状态和缺失字段。不是全网搜索，不读取个人记录。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
     "kitVer": "skillFw2_4",
-    "callDemo": "[]",
-    "skillUrl": "",
+    "callDemo": "[{\"name\": \"查询北京残疾人服务信息\", \"execution\": {\"appCode\": \"hiDear\", \"operationId\": \"hidear_search_information\", \"params\": {\"query\": \"补贴\", \"city\": \"北京\"}}, \"validation\": {\"expectedCode\": 0, \"expectedResult\": \"{\\\"code\\\":0,\\\"success\\\":true}\"}, \"demoFiles\": []}]",
+    "skillUrl": "https://hidear-public-demo.onrender.com/public/tools/search_information",
     "httpHeaders": "{\"Content-Type\":\"application/json\"}",
     "defBodyParams": "{}",
     "timeout": "5000",
-    "skillProtocol": "{\"operationId\": \"hidear_search_information\", \"name\": \"查询重要信息\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"查询已收录的公开信息与当前用户的未核实线索。不是全网搜索；空结果不表示没有政策。默认排除过期、撤回事项。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"需服务已部署。不是全网搜索；不提交报名、不设置提醒\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_search_information\", \"parameters\": {\"type\": \"object\", \"properties\": {\"query\": {\"type\": \"string\", \"description\": \"标题、主题或摘要关键词\", \"minLength\": 1, \"maxLength\": 200}, \"city\": {\"type\": \"string\", \"description\": \"城市；同时匹配全国事项\", \"minLength\": 1, \"maxLength\": 80}, \"include_expired\": {\"type\": \"boolean\", \"description\": \"是否包含过期事项\"}, \"limit\": {\"type\": \"integer\", \"description\": \"最多返回条数\", \"minimum\": 1, \"maximum\": 20}}, \"required\": [], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1]}, \"success\": {\"type\": \"boolean\"}, \"request_id\": {\"type\": \"string\"}, \"result\": {\"type\": \"object\"}, \"error\": {\"type\": \"object\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
+    "skillProtocol": "{\"operationId\": \"hidear_search_information\", \"name\": \"查询重要信息\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"查询 HiDear 已收录的公开服务信息，返回官方来源、核验状态和缺失字段。不是全网搜索，不读取个人记录。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_search_information\", \"parameters\": {\"type\": \"object\", \"properties\": {\"query\": {\"type\": \"string\", \"description\": \"标题、主题或摘要关键词\", \"minLength\": 1, \"maxLength\": 200}, \"city\": {\"type\": \"string\", \"description\": \"城市；同时匹配全国事项\", \"minLength\": 1, \"maxLength\": 80}, \"include_expired\": {\"type\": \"boolean\", \"description\": \"是否包含过期事项\"}, \"limit\": {\"type\": \"integer\", \"description\": \"最多返回条数\", \"minimum\": 1, \"maximum\": 20}}, \"required\": [], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1], \"description\": \"状态码，0成功，1失败\"}, \"success\": {\"type\": \"boolean\", \"description\": \"调用是否成功\"}, \"request_id\": {\"type\": \"string\", \"description\": \"本次调用标识\"}, \"result\": {\"type\": \"object\", \"description\": \"公开信息或行动清单；失败时为空\"}, \"error\": {\"type\": \"object\", \"description\": \"错误代码和说明；成功时为空\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
     "triggerQueries": [
-      "查找和我有关的重要信息",
-      "帮我核对这条公告",
-      "查看培训报名条件",
-      "我要准备什么材料",
-      "这条信息截止了吗"
+      "查询北京残疾人服务信息",
+      "查找收录的补贴信息",
+      "有没有办证相关信息",
+      "找找公开服务公告",
+      "查询与就业有关的重要信息"
     ]
   },
   {
@@ -25,20 +25,20 @@
     "name": "读取公告详情",
     "appCode": "hiDear",
     "appName": "HiDear",
-    "description": "{\"overview\": \"获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"需服务已部署。不是全网搜索；不提交报名、不设置提醒\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
+    "description": "{\"overview\": \"获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
     "kitVer": "skillFw2_4",
-    "callDemo": "[]",
-    "skillUrl": "",
+    "callDemo": "[{\"name\": \"查看这条公告的官方来源\", \"execution\": {\"appCode\": \"hiDear\", \"operationId\": \"hidear_get_information\", \"params\": {\"information_id\": \"98e69f6276d86db16decc4b8a3bc3eea\"}}, \"validation\": {\"expectedCode\": 0, \"expectedResult\": \"{\\\"code\\\":0,\\\"success\\\":true}\"}, \"demoFiles\": []}]",
+    "skillUrl": "https://hidear-public-demo.onrender.com/public/tools/get_information",
     "httpHeaders": "{\"Content-Type\":\"application/json\"}",
     "defBodyParams": "{}",
     "timeout": "5000",
-    "skillProtocol": "{\"operationId\": \"hidear_get_information\", \"name\": \"读取公告详情\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"需服务已部署。不是全网搜索；不提交报名、不设置提醒\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_get_information\", \"parameters\": {\"type\": \"object\", \"properties\": {\"information_id\": {\"type\": \"string\", \"description\": \"信息标识\", \"minLength\": 1, \"maxLength\": 64}}, \"required\": [\"information_id\"], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1]}, \"success\": {\"type\": \"boolean\"}, \"request_id\": {\"type\": \"string\"}, \"result\": {\"type\": \"object\"}, \"error\": {\"type\": \"object\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
+    "skillProtocol": "{\"operationId\": \"hidear_get_information\", \"name\": \"读取公告详情\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"获取公告及核验状态、来源和缺失字段。只能读取公开条目或当前用户线索。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_get_information\", \"parameters\": {\"type\": \"object\", \"properties\": {\"information_id\": {\"type\": \"string\", \"description\": \"信息标识\", \"minLength\": 1, \"maxLength\": 64}}, \"required\": [\"information_id\"], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1], \"description\": \"状态码，0成功，1失败\"}, \"success\": {\"type\": \"boolean\", \"description\": \"调用是否成功\"}, \"request_id\": {\"type\": \"string\", \"description\": \"本次调用标识\"}, \"result\": {\"type\": \"object\", \"description\": \"公开信息或行动清单；失败时为空\"}, \"error\": {\"type\": \"object\", \"description\": \"错误代码和说明；成功时为空\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
     "triggerQueries": [
-      "查找和我有关的重要信息",
-      "帮我核对这条公告",
-      "查看培训报名条件",
-      "我要准备什么材料",
-      "这条信息截止了吗"
+      "查看这条公告的官方来源",
+      "这条信息核实了吗",
+      "看看这条服务信息的详情",
+      "这条公告还有哪些信息待确认",
+      "查询这条公告的核验时间"
     ]
   },
   {
@@ -46,20 +46,20 @@
     "name": "准备行动清单",
     "appCode": "hiDear",
     "appName": "HiDear",
-    "description": "{\"overview\": \"生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"需服务已部署。不是全网搜索；不提交报名、不设置提醒\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
+    "description": "{\"overview\": \"生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。\", \"useCases\": \"查询管理员收录的公开公告；不读取个人记录\", \"constraints\": \"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\", \"output\": \"code、success、request_id、result、error\", \"example\": \"在当前信息库查询公开信息\"}",
     "kitVer": "skillFw2_4",
-    "callDemo": "[]",
-    "skillUrl": "",
+    "callDemo": "[{\"name\": \"根据这条公告列出下一步\", \"execution\": {\"appCode\": \"hiDear\", \"operationId\": \"hidear_prepare_action\", \"params\": {\"information_id\": \"98e69f6276d86db16decc4b8a3bc3eea\"}}, \"validation\": {\"expectedCode\": 0, \"expectedResult\": \"{\\\"code\\\":0,\\\"success\\\":true}\"}, \"demoFiles\": []}]",
+    "skillUrl": "https://hidear-public-demo.onrender.com/public/tools/prepare_action",
     "httpHeaders": "{\"Content-Type\":\"application/json\"}",
     "defBodyParams": "{}",
     "timeout": "5000",
-    "skillProtocol": "{\"operationId\": \"hidear_prepare_action\", \"name\": \"准备行动清单\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"需服务已部署。不是全网搜索；不提交报名、不设置提醒\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_prepare_action\", \"parameters\": {\"type\": \"object\", \"properties\": {\"information_id\": {\"type\": \"string\", \"description\": \"信息标识\", \"minLength\": 1, \"maxLength\": 64}}, \"required\": [\"information_id\"], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1]}, \"success\": {\"type\": \"boolean\"}, \"request_id\": {\"type\": \"string\"}, \"result\": {\"type\": \"object\"}, \"error\": {\"type\": \"object\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
+    "skillProtocol": "{\"operationId\": \"hidear_prepare_action\", \"name\": \"准备行动清单\", \"appCode\": \"hiDear\", \"description\": \"{\\\"overview\\\": \\\"生成公告行动清单，不提交报名。过期或撤回的信息不能生成报名计划；未核实信息明确标记待核实。\\\", \\\"useCases\\\": \\\"查询管理员收录的公开公告；不读取个人记录\\\", \\\"constraints\\\": \\\"只读公开演示，不认定个人资格、不提交报名、不设置提醒。免费服务闲置后休眠，首次请求可能超时，需先打开演示首页唤醒。\\\", \\\"output\\\": \\\"code、success、request_id、result、error\\\", \\\"example\\\": \\\"在当前信息库查询公开信息\\\"}\", \"skillSource\": \"2\", \"agentVersion\": 30000, \"androidPerm\": \"[]\", \"supportDevice\": 5, \"executeScenarios\": 7, \"remark\": \"\", \"protocolType\": \"vivo\", \"daMetaData\": null, \"skillFrameworkSpec\": \"skillFw2_4\", \"functionName\": \"hidear_prepare_action\", \"parameters\": {\"type\": \"object\", \"properties\": {\"information_id\": {\"type\": \"string\", \"description\": \"信息标识\", \"minLength\": 1, \"maxLength\": 64}}, \"required\": [\"information_id\"], \"additionalProperties\": false}, \"returns\": {\"type\": \"Object\", \"description\": \"统一返回结构\", \"properties\": {\"code\": {\"type\": \"integer\", \"enum\": [0, 1], \"description\": \"状态码，0成功，1失败\"}, \"success\": {\"type\": \"boolean\", \"description\": \"调用是否成功\"}, \"request_id\": {\"type\": \"string\", \"description\": \"本次调用标识\"}, \"result\": {\"type\": \"object\", \"description\": \"公开信息或行动清单；失败时为空\"}, \"error\": {\"type\": \"object\", \"description\": \"错误代码和说明；成功时为空\"}}, \"required\": [\"code\", \"success\", \"request_id\"]}, \"platformConfigs\": {\"customBasicFields\": {}, \"customParamFields\": {}, \"customReturnFields\": {}}}",
     "triggerQueries": [
-      "查找和我有关的重要信息",
-      "帮我核对这条公告",
-      "查看培训报名条件",
-      "我要准备什么材料",
-      "这条信息截止了吗"
+      "根据这条公告列出下一步",
+      "我需要先核对什么条件",
+      "帮我准备行动清单",
+      "这条信息需要哪些材料",
+      "办理前还缺哪些信息"
     ]
   }
 ]
