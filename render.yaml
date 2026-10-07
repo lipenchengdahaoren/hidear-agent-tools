@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: hidear-public-demo
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: HIDEAR_PUBLIC_ONLY
+        value: "1"

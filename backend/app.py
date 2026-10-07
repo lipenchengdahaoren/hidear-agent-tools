@@ -329,8 +329,9 @@ def openapi():
 
 
 class App:
-    def __init__(self, service):
+    def __init__(self, service, public_only=False):
         self.service = service
+        self.public_only = public_only
 
     def __call__(self, env, start_response):
         path, method = env.get("PATH_INFO", ""), env.get("REQUEST_METHOD", "GET")
@@ -342,7 +343,7 @@ class App:
             elif method == "GET" and path == "/openapi.json":
                 result = openapi()
             elif method == "GET" and path == "/":
-                result = (ROOT / "console.html").read_bytes()
+                result = (ROOT / ("public.html" if self.public_only else "console.html")).read_bytes()
                 content_type = "text/html; charset=utf-8"
             elif method == "POST" and path.startswith("/public/tools/"):
                 tool = path[len("/public/tools/"):]
@@ -365,6 +366,8 @@ class App:
                     public_result = getattr(self.service, tool)(db, "public", arguments)
                 result = {"success": True, "request_id": uuid.uuid4().hex, "result": public_result, "error": None}
             else:
+                if self.public_only:
+                    raise Problem("not_found", "此演示仅提供公开查询，不保存个人待办", 404)
                 auth = env.get("HTTP_AUTHORIZATION", "")
                 if not auth.startswith("Bearer "):
                     raise Problem("unauthorized", "需要用户凭证", 401)
@@ -405,7 +408,12 @@ class App:
 
 
 def factory():
-    return App(Service(os.environ.get("HIDEAR_DATABASE", str(ROOT / "data" / "hidear.sqlite3"))))
+    service = Service(os.environ.get("HIDEAR_DATABASE", str(ROOT / "data" / "hidear.sqlite3")))
+    public_only = os.environ.get("HIDEAR_PUBLIC_ONLY") == "1"
+    if public_only:
+        for record in json.loads((ROOT / "public-information.json").read_text(encoding="utf-8")):
+            service.import_public(record)
+    return App(service, public_only=public_only)
 
 
 def main():

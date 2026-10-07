@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / 'backend'))
 from app import TOOLS, openapi
 
 PUBLIC_FILES = [
+    'render.yaml', 'backend/public.html', 'backend/public-information.json', 'docs/free-demo.md',
     'README.md', '.gitignore', '.github/workflows/checks.yml', 'build_release.py',
     'backend/app.py', 'backend/console.html', 'backend/test_app.py', 'backend/setup_local.py',
     'backend/Dockerfile', 'backend/.dockerignore', 'review-cases.md',

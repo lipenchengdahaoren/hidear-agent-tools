@@ -9,7 +9,7 @@ from unittest.mock import patch
 from datetime import timedelta
 from pathlib import Path
 
-from app import App, Problem, Service, TOOLS, iso, now, openapi
+from app import App, Problem, Service, TOOLS, factory, iso, now, openapi
 
 
 class ToolTests(unittest.TestCase):
@@ -31,6 +31,23 @@ class ToolTests(unittest.TestCase):
 
     def create(self):
         return self.call('create_followup', dict(title='核对报名', due_at=self.future, confirmed=True))
+
+    def test_public_deployment_reseeds_and_disables_private_routes(self):
+        with patch.dict(os.environ, {'HIDEAR_DATABASE': str(Path(self.tmp.name) / 'demo.sqlite3'), 'HIDEAR_PUBLIC_ONLY': '1'}):
+            deployed = factory()
+            deployed = factory()  # restart must not duplicate source records
+        statuses = []
+        def request(path, arguments, token=''):
+            body = json.dumps(arguments).encode()
+            environment = {'PATH_INFO': path, 'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': 'application/json', 'CONTENT_LENGTH': str(len(body)), 'wsgi.input': io.BytesIO(body), 'HTTP_AUTHORIZATION': 'Bearer ' + token}
+            return json.loads(b''.join(deployed(environment, lambda status, headers: statuses.append(status))))
+        response = request('/public/tools/search_information', {'query': '补贴', 'city': '北京'})
+        self.assertEqual(response['result']['total'], 1)
+        identity = response['result']['items'][0]['id']
+        self.assertEqual(request('/public/tools/prepare_action', {'information_id': identity})['result']['eligibility_status'], 'not_determined')
+        token = deployed.service.issue_token('test')
+        self.assertFalse(request('/tools/create_followup', {'title': 'test', 'due_at': self.future, 'confirmed': True}, token)['success'])
+        self.assertTrue(statuses[-1].startswith('404'))
 
     def test_user_isolation(self):
         item = self.create()
